@@ -19,21 +19,7 @@ public class Main {
             out.write(buffer, 0, read);
 
         Scope scope = Scope.parse(out.toString());
-        recursivePrintScope(scope);
+        System.out.println(Scope.parse(scope.toString()));
         in.close();
-    }
-
-    private static void recursivePrintScope(Scope scope) {
-        System.out.println("{");
-        for (Map.Entry<String, Object> entry : scope.entrySet()) {
-            System.out.print(entry.getKey() + ": ");
-            if (entry.getValue() instanceof Object[])
-                System.out.println(Arrays.toString((Object[]) entry.getValue()));
-            else if (entry.getValue() instanceof Scope)
-                recursivePrintScope((Scope) entry.getValue());
-            else
-                System.out.println(entry.getValue());
-        }
-        System.out.println("}");
     }
 }

@@ -33,7 +33,7 @@ public class Parser {
         return token;
     }
 
-    public Object parseVariable() {
+    public Object parseVariable(Scope parent) {
         Token token = consume();
         switch (token.type) {
             case NULL:
@@ -45,44 +45,44 @@ public class Parser {
             case FALSE:
                 return false;
             case BRACE_L:
-                return parseScope();
+                return parseScope(parent);
             case BRACKET_L:
-                return parseArray();
+                return parseArray(parent);
             default:
-                throw new ScopeScriptParseException(token);
+                throw new SSCParseException(token);
         }
     }
 
-    public Object[] parseArray() {
+    public Object[] parseArray(Scope parent) {
         List<Object> list = new LinkedList<>();
         while (true) {
-           list.add(parseVariable());
+           list.add(parseVariable(parent));
            Token token = consume();
            if (token.type == TokenType.BRACKET_R)
                break;
            if (token.type != TokenType.COMMA)
-               throw new ScopeScriptParseException(token);
+               throw new SSCParseException(token);
         }
 
         return list.toArray();
     }
 
-    public Scope parseScope() {
-        Scope scope = new Scope();
+    public Scope parseScope(Scope parent) {
+        Scope scope = new Scope(parent);
         while (peek(0) != TokenType.BRACE_R) {
             Token token = consume();
             if (token.type != TokenType.IDENTIFIER)
-                throw new ScopeScriptParseException(token);
+                throw new SSCParseException(token);
 
             consume();
             if (peek(-1) == TokenType.EQUALS)
-                scope.put((String) token.value, parseVariable());
+                scope.put((String) token.value, parseVariable(scope));
             else if (peek(-1) == TokenType.BRACE_L)
-                scope.put((String) token.value, parseScope());
+                scope.put((String) token.value, parseScope(scope));
             else if (peek(-1) == TokenType.BRACKET_L)
-                scope.put((String) token.value, parseArray());
+                scope.put((String) token.value, parseArray(scope));
             else
-                throw new ScopeScriptParseException(Objects.requireNonNull(peekGetToken()));
+                throw new SSCParseException(Objects.requireNonNull(peekGetToken()));
         }
         consume();
 
