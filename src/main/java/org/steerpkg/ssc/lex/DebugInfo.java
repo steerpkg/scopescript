@@ -2,13 +2,17 @@ package org.steerpkg.ssc.lex;
 
 public class DebugInfo {
 
-    public int character = 0;
-    public int line = 0;
+    public int line;
+    public int character;
 
+    public DebugInfo(int line, int character) {
+        this.line = line;
+        this.character = character;
+    }
+
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
     @Override
     public DebugInfo clone() {
-        try {
-            return (DebugInfo) super.clone();
-        } catch (Exception ignored) { return null; }
+        return new DebugInfo(line, character);
     }
 }

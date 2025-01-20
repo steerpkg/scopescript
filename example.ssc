@@ -2,7 +2,9 @@ string = "hello world"
 number = 12e-3
 bool = true
 nothing = null
-array ["hello world", 12e-3, false, null]
+array ["hello world", 12e-3, false, null, {
+    nested-array-scope = "hello world"
+}, ["nested array"]]
 
 scope {
     name = "hello world"

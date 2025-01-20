@@ -6,10 +6,10 @@ import java.util.List;
 
 public class Lexer {
 
-    private char[] source;
+    private final char[] source;
     private int i;
     private String mode = "\0";
-    private final DebugInfo info = new DebugInfo();
+    private final DebugInfo info = new DebugInfo(0, 0);
 
     public Lexer(char[] source) {
         this.source = source;
@@ -135,6 +135,7 @@ public class Lexer {
             if (t != null) list.add(t);
         }
         flushIdentifier(list, identifier, false);
+        list.add(new Token(TokenType.BRACE_R, info));
 
         return new ArrayList<>(list);
     }
