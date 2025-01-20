@@ -1,0 +1,9 @@
+string = "hello world"
+number = 12e-3
+bool = true
+nothing = null
+array ["hello world", 12e-3, false, null]
+
+scope {
+
+}
