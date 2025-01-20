@@ -4,8 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Map;
 
 public class Main {
 
@@ -17,9 +15,19 @@ public class Main {
         int read;
         while ((read = in.read(buffer)) != -1)
             out.write(buffer, 0, read);
-
-        Scope scope = Scope.parse(out.toString());
-        System.out.println(Scope.parse(scope.toString()));
         in.close();
+
+        char[] output = out.toString().toCharArray();
+
+        System.out.println("Starting: Parsing");
+        int iterations = 100000;
+
+        for (int i = 0; i < iterations; i++) {
+            long t1 = System.nanoTime();
+            Scope.parse(output);
+            long t2 = System.nanoTime();
+
+            System.out.print("\r" + ((t2 - t1) * 1e-6) + "ms");
+        }
     }
 }
