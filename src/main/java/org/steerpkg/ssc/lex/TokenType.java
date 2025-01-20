@@ -11,5 +11,6 @@ public enum TokenType {
     BRACE_R,
     BRACKET_L,
     BRACKET_R,
+    COMMA,
     IDENTIFIER
 }

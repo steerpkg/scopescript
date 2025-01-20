@@ -11,8 +11,10 @@ public class Main {
         InputStream in = Files.newInputStream(Paths.get("example.ssc"));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];
-        while (in.read(buffer) != -1)
-            out.write(buffer);
+
+        int read;
+        while ((read = in.read(buffer)) != -1)
+            out.write(buffer, 0, read);
 
         System.out.println(Scope.parse(out.toString()));
         in.close();
