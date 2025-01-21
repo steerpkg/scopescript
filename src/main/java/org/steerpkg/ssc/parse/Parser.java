@@ -8,36 +8,69 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Parses a list of tokens into a Scope object.
+ * @since 0.1.0
+ * @author shiftfox
+ */
 public class Parser {
 
+    /**
+     * The current index.
+     */
     private int i = 0;
+    /**
+     * The source list of tokens.
+     */
     private final List<Token> source;
 
+    /**
+     * Creates a new parser for a list of tokens.
+     * @param source The source list of tokens
+     */
     public Parser(List<Token> source) {
         this.source = source;
     }
 
+    /**
+     * Shows what the <code>next + skip</code> token is.
+     * @param skip The amount of tokens to skip
+     * @return The type of the next token
+     */
     private TokenType peek(int skip) {
         if (i + skip > source.size()) return null;
         return source.get(i + skip).type;
     }
 
+    /**
+     * Shows what the last token is.
+     * @return The last token
+     */
     private Token peekGetToken() {
         if (i - 1 > source.size()) return null;
         return source.get(i - 1);
     }
 
+    /**
+     * Gets a token, and increases the current index.
+     * @return The current token
+     */
     private Token consume() {
         Token token = source.get(i);
         i++;
         return token;
     }
 
+    /**
+     * Looks up a variable recursively through scopes.
+     * @param scope The scope to look into
+     * @param key The key to search for
+     * @return The value of the key, or null if not found
+     */
     private Object lookup(Scope scope, String key) {
         if (scope.containsKey(key)) {
             Object value = scope.get(key);
             if (value != null) {
-                Object result = value;
                 while (peek(0) == TokenType.BRACKET_L) {
                     consume();
                     Token token = consume();
@@ -45,11 +78,11 @@ public class Parser {
                         case STRING:
                         case IDENTIFIER:
                             assert value instanceof Scope;
-                            result = ((Scope) result).get((String) token.value);
+                            value = ((Scope) value).get((String) token.value);
                             break;
                         case NUMBER:
                             assert value instanceof Object[];
-                            result = ((Object[]) result)[((Double) token.value).intValue()];
+                            value = ((Object[]) value)[((Double) token.value).intValue()];
                             break;
                         default:
                             throw new SSCParseException(token);
@@ -59,7 +92,7 @@ public class Parser {
                     if (rightBracket.type != TokenType.BRACKET_R)
                         throw new SSCParseException(rightBracket);
                 }
-                return result;
+                return value;
             }
         }
 
@@ -68,6 +101,11 @@ public class Parser {
         return lookup(scope.parent, key);
     }
 
+    /**
+     * Parses a variable.
+     * @param parent The scope this variable is part of (the parent in the case of arrays or scopes)
+     * @return The parsed variable
+     */
     public Object parseVariable(Scope parent) {
         Token token = consume();
         switch (token.type) {
@@ -90,6 +128,11 @@ public class Parser {
         }
     }
 
+    /**
+     * Parses an array.
+     * @param parent The parent of the array
+     * @return The parsed array
+     */
     public Object[] parseArray(Scope parent) {
         List<Object> list = new LinkedList<>();
         while (true) {
@@ -104,6 +147,11 @@ public class Parser {
         return list.toArray();
     }
 
+    /**
+     * Parses a scope.
+     * @param parent The parent of the scope
+     * @return The parsed scope
+     */
     public Scope parseScope(Scope parent) {
         Scope scope = new Scope(parent);
         while (peek(0) != TokenType.BRACE_R) {

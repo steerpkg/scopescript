@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class Main {
-
     public static void main(String[] args) throws Exception {
         InputStream in = Files.newInputStream(Paths.get("example.ssc"));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -17,19 +16,32 @@ public class Main {
             out.write(buffer, 0, read);
         in.close();
 
-        char[] output = out.toString().toCharArray();
+        int iterations = 100000;
+        char[] input = out.toString().toCharArray();
+
+        Scope scope = Scope.parse(input);
+        System.out.println(scope);
 
         System.out.println("Starting: Parsing");
-        int iterations = 100000;
-
-        System.out.println(Scope.parse(output));
-
+        long totalParsingTime = 0;
         for (int i = 0; i < iterations; i++) {
             long t1 = System.nanoTime();
-            Scope.parse(output);
+            Scope.parse(input);
             long t2 = System.nanoTime();
-
-            System.out.print("\r" + ((t2 - t1) * 1e-6) + "ms");
+            totalParsingTime += (t2 - t1);
         }
+        double averageParsingTime = (totalParsingTime / (double) iterations) * 1e-6;
+        System.out.println("Average Parsing Time: " + averageParsingTime + "ms");
+
+        System.out.println("Starting: Serializing");
+        long totalSerializingTime = 0;
+        for (int i = 0; i < iterations; i++) {
+            long t1 = System.nanoTime();
+            scope.toString();
+            long t2 = System.nanoTime();
+            totalSerializingTime += (t2 - t1);
+        }
+        double averageSerializingTime = (totalSerializingTime / (double) iterations) * 1e-6;
+        System.out.println("Average Serializing Time: " + averageSerializingTime + "ms");
     }
 }
