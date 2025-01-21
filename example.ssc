@@ -2,11 +2,24 @@ string = "hello world"
 number = 12e-3
 bool = true
 nothing = null
-array ["hello world", 12e-3, false, null, {
-    nested-array-scope = "hello world"
-}, ["nested array"]]
+array [
+    "what is up",
+    12e-3,
+    false,
+    null,
+    {
+        nested-array-scope = "this scope is inside an array"
+    },
+    ["nested array"]
+]
 
 scope {
-    name = "hello world"
+    name = string
     version = 0.1
+
+    sub-scope {
+        better = "properties"
+    }
 }
+
+testing = array[4][nested-array-scope]

@@ -33,6 +33,41 @@ public class Parser {
         return token;
     }
 
+    private Object lookup(Scope scope, String key) {
+        if (scope.containsKey(key)) {
+            Object value = scope.get(key);
+            if (value != null) {
+                Object result = value;
+                while (peek(0) == TokenType.BRACKET_L) {
+                    consume();
+                    Token token = consume();
+                    switch (token.type) {
+                        case STRING:
+                        case IDENTIFIER:
+                            assert value instanceof Scope;
+                            result = ((Scope) result).get((String) token.value);
+                            break;
+                        case NUMBER:
+                            assert value instanceof Object[];
+                            result = ((Object[]) result)[((Double) token.value).intValue()];
+                            break;
+                        default:
+                            throw new SSCParseException(token);
+                    }
+
+                    Token rightBracket = consume();
+                    if (rightBracket.type != TokenType.BRACKET_R)
+                        throw new SSCParseException(rightBracket);
+                }
+                return result;
+            }
+        }
+
+        if (scope.parent == null)
+            return null;
+        return lookup(scope.parent, key);
+    }
+
     public Object parseVariable(Scope parent) {
         Token token = consume();
         switch (token.type) {
@@ -48,6 +83,8 @@ public class Parser {
                 return parseScope(parent);
             case BRACKET_L:
                 return parseArray(parent);
+            case IDENTIFIER:
+                return lookup(parent, (String) token.value);
             default:
                 throw new SSCParseException(token);
         }

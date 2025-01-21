@@ -22,6 +22,8 @@ public class Main {
         System.out.println("Starting: Parsing");
         int iterations = 100000;
 
+        System.out.println(Scope.parse(output));
+
         for (int i = 0; i < iterations; i++) {
             long t1 = System.nanoTime();
             Scope.parse(output);
